@@ -30,21 +30,245 @@ Close the Simulation Once done, by going to Simulation → "Close Simulation
 
 Input/Output Signal Diagram:
 
-D FF
+D FF 
+<br>
+<img width="300" height="123" alt="image" src="https://github.com/user-attachments/assets/7433fdf3-eee4-43e8-8409-e3cf97dd8094" /> 
+<br>
+<img width="174" height="156" alt="image" src="https://github.com/user-attachments/assets/9e460b9f-836a-4e04-9a23-440c129f685b" />
+<br>
+
+
 
 SR FF
+<br>
+<img width="272" height="559" alt="image" src="https://github.com/user-attachments/assets/4d40056a-d495-45b6-ba1c-3abfbb1731c8" />
+<br>
 
 JK FF
+<br>
+<img width="387" height="647" alt="image" src="https://github.com/user-attachments/assets/9c6cab9a-9a84-4861-b2f2-0d226dd8a692" />
+<br>
 
 T FF
+<br>
+<img width="300" height="143" alt="image" src="https://github.com/user-attachments/assets/195613ee-3fd1-4d7c-9087-777505f487f9" /> 
+<br>
+<img width="300" height="127" alt="image" src="https://github.com/user-attachments/assets/dfd8f91f-5161-43d6-b670-627dd53ddcce" />
+<br>
+
 
 
 RTL Code:
 
+D Flip Flop
+```
+module dff(clk,rst,d,dout);
+input clk, rst, d;
+output reg dout;
+always @(posedge clk)
+begin
+   if (rst)
+       dout <= 1'b0;
+   else
+       dout <= d;
+   end
+endmodule
+```
+T Flip Flop
+```
+module tff(clk,rst,t,t_out);
+input clk,rst,t;
+output reg t_out;
+always @(posedge clk)
+begin   
+   if (rst)
+       t_out <= 1'b0;
+   else if (t)
+       t_out <= ~t_out;
+   else
+       t_out <= t_out;
+   end
+endmodule
+
+```
+SR Flip Flop
+```
+module srff (s,r,clk,rst,out);
+input s, r, clk, rst;
+output reg out ;
+always @ (posedge clk)
+begin 
+   if (rst)
+       out <= 1'b0;
+   else if (s & ~r)
+       out <= 1'b1;
+   else if (~s & r)
+       out <= 1'b0;
+   else 
+       out <= 1'bx;
+end
+endmodule
+
+```
+JK Flip Flop
+```module jkff (clk,rst,j,k,out);
+input clk, rst, j,k;
+output reg out;
+always @(posedge clk)
+begin
+    if (rst)
+        out <= 1'b0;
+    else if (j & ~k)
+        out <= 1'b1;
+    else if (~j & k)
+        out <= 1'b0;
+    else
+        out <= ~out;
+end
+endmodule
+```
+
 TestBench:
+
+D Flip Flop
+```
+module dff_tb;
+reg clk_t,rst_t,d_t;
+wire dout_t;
+d_flip dut (.clk(clk_t),.rst(rst_t),.d(d_t),.dout(dout_t));
+initial
+begin
+    d_t = 1'b0;
+    clk_t = 1'b0;
+    rst_t = 1'b1;
+    #20
+    rst_t = 0;
+    d_t = 1'b0;
+    #20
+    d_t = 1'b1;
+end
+always
+    #20 
+    clk_t = ~clk_t;
+endmodule
+```
+
+T Flip Flop
+```
+module tff_tb;
+reg clk_t, rst_t, t_t;
+wire tout_t;
+t_flip dut(.clk(clk_t),.rst(rst_t),.t(t_t),.t_out(tout_t));
+initial
+begin
+    clk_t = 1'b0;
+    rst_t = 1'b1;
+    #20
+    rst_t = 1'b0;
+    t_t = 1'b0;
+    #20
+    t_t = 1'b1;
+    end
+    always 
+    #10
+clk_t = ~clk_t;
+endmodule
+```
+
+SR Flip Flop
+```
+module srff_tb;
+reg clk_t,rst_t,s_t,r_t;
+wire out_t;
+
+sr_flip dut(.clk(clk_t),.rst(rst_t),.s(s_t),.r(r_t),.out(out_t));
+
+initial
+begin
+    clk_t=1'b0;
+    rst_t = 1'b1;
+    s_t=1'b0;
+    r_t= 1'b0;
+    #20
+    rst_t = 1'b0;
+    s_t = 1'b1;
+    r_t = 1'b0;
+    #20
+    s_t=1'b0;
+    r_t= 1'b1 ;
+    #20
+    s_t = 1'b0;
+    r_t = 1'b0;
+    #20
+    s_t = 1'b1 ;
+    r_t = 1'b1 ;
+end
+always #10
+clk_t = ~clk_t;
+
+endmodule
+
+```
+JK Flip Flop
+``` 
+module jkff_tb;
+reg clk_t,rst_t,j_t,k_t;
+wire out_t;
+jkFlipFlop dut(.clk(clk_t),.rst(rst_t),.j(j_t),.k(k_t),.out(out_t));
+
+initial 
+begin
+    clk_t = 1'b0;
+    rst_t = 1'b1;
+    j_t = 1'b0;
+    k_t = 1'b0;
+    #20
+    rst_t = 1'b0;
+    j_t= 1'b1;
+    k_t=1'b0;
+    #20
+    j_t= 1'b0;
+    k_t = 1'b1;
+    #20
+    j_t=1'b0;
+    k_t=1'b0;
+    #20
+    j_t = 1'b1;
+    k_t = 1'b1;
+end
+always #10
+clk_t = ~clk_t;
+
+endmodule
+
+```
+
 
 Output waveform:
 
+D Flip Flop:
+<br>
+<img width="1919" height="1078" alt="image" src="https://github.com/user-attachments/assets/15fb271a-1dcc-47ad-b0e8-635ad7cdf1a8" />
+<br>
+
+T Flip Flop:
+<br>
+<img width="1919" height="1077" alt="image" src="https://github.com/user-attachments/assets/f662a6e9-847e-4957-9a31-af1f2f7ec584" />
+<br>
+
+SR Flip Flop:
+<br>
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/49c2a9e6-18b1-435c-ade0-69be4af34076" />
+<br>
+
+JK Flip Flop:
+<br>
+<img width="1910" height="1079" alt="image" src="https://github.com/user-attachments/assets/20a50fee-3917-400a-a08d-6012a47489f2" />
+<br>
+
+
 Conclusion:
+
+In this experiment, the design and simulation of SR, JK, D, and T flip-flops were successfully implemented using Verilog HDL. Each flip-flop was verified with appropriate testbenches and their characteristic behaviors were observed. The SR flip-flop showed the basic set–reset operation with an invalid state, while the JK flip-flop overcame this problem by introducing a toggle feature. The D flip-flop transferred the input directly to the output at each clock edge, and the T flip-flop toggled the output when the input was high. Thus, the experiment demonstrated the working principles of the fundamental flip-flops, which serve as the basic building blocks for sequential circuits and memory design.
 
 
